@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tug of Math - LinkedIn Video Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090d16;
+      color: #fff;
+      font-family: 'Outfit', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #mainCanvas {
+      width: 1920px;
+      height: 1080px;
+      background: #f8fafc;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+    #stadiumCanvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden stadium canvas for TugArena rendering -->
+  <canvas id="stadiumCanvas" width="880" height="780"></canvas>
+
+  <!-- Master 1920x1080 composition canvas -->
+  <canvas id="mainCanvas" width="1920" height="1080"></canvas>
+
+  <script type="module">
+    import { TugArena } from './js/characters.js';
+
+    const stadiumCanvas = document.getElementById('stadiumCanvas');
+    const arena = new TugArena(stadiumCanvas);
+    arena.width = 880;
+    arena.height = 780;
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Helper: Rounded rectangle
+    function roundRect(ctx, x, y, w, h, r, fill, stroke, strokeColor, strokeWidth = 2) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      if (fill) {
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.stroke();
+      }
+    }
+
+    // Helper: Draw touch cursor ripple
+    function drawCursor(ctx, x, y, scale = 1, alpha = 1) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(x, y, 22 * scale, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(x, y, 10 * scale, 0, Math.PI * 2);
+      ctx.fillStyle = '#3b82f6';
+      ctx.shadowColor = 'rgba(59, 130, 246, 0.8)';
+      ctx.shadowBlur = 15;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // SCENE 1: SETUP SCREEN & WATCH DIAL (0.0s - 3.5s)
+    // =========================================================================
+    function drawScene1(t) {
+      const bg = ctx.createLinearGradient(0, 0, 1920, 1080);
+      bg.addColorStop(0, '#f0fdf4');
+      bg.addColorStop(0.5, '#e0f2fe');
+      bg.addColorStop(1, '#f8fafc');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      // Top Tag
+      ctx.save();
+      roundRect(ctx, 800, 36, 320, 44, 22, '#ffffff', true, '#e2e8f0', 2);
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '800 18px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🪢 SMARTBOARD MATH BATTLE', 960, 58);
+      ctx.restore();
+
+      // Hero Title
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 68px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('TUG OF MATH', 960, 150);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '600 24px Outfit';
+      ctx.fillText('Two competitors pull the rope with math brain power! Who will win?', 960, 195);
+
+      // Setup White Card
+      const cardX = 460;
+      const cardY = 230;
+      const cardW = 1000;
+      const cardH = 780;
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.12)';
+      ctx.shadowBlur = 35;
+      ctx.shadowOffsetY = 15;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 32, '#ffffff', true, '#e2e8f0', 2);
+      ctx.restore();
+
+      // Competitors Section
+      ctx.fillStyle = '#334155';
+      ctx.font = '800 20px Outfit';
+      ctx.textAlign = 'left';
+      ctx.fillText('👥 Competitor Names', cardX + 50, cardY + 50);
+
+      // Blue Player Card
+      roundRect(ctx, cardX + 50, cardY + 70, 390, 80, 20, '#eff6ff', true, '#bfdbfe', 2);
+      ctx.font = '40px Outfit';
+      ctx.fillText('👦', cardX + 70, cardY + 125);
+      ctx.fillStyle = '#3b82f6';
+      ctx.font = '700 13px Outfit';
+      ctx.fillText('PLAYER 1 (BLUE)', cardX + 130, cardY + 98);
+      ctx.fillStyle = '#1e3a8a';
+      ctx.font = '900 28px Outfit';
+      ctx.fillText('BOYS', cardX + 130, cardY + 130);
+
+      // VS Badge
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cardX + 500, cardY + 110, 26, 0, Math.PI * 2);
+      ctx.fillStyle = '#f59e0b';
+      ctx.shadowColor = 'rgba(245, 158, 11, 0.4)';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 18px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('VS', cardX + 500, cardY + 110);
+      ctx.restore();
+
+      // Red Player Card
+      roundRect(ctx, cardX + 560, cardY + 70, 390, 80, 20, '#fff1f2', true, '#fecdd3', 2);
+      ctx.font = '40px Outfit';
+      ctx.fillText('👧', cardX + 580, cardY + 125);
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '700 13px Outfit';
+      ctx.fillText('PLAYER 2 (RED)', cardX + 640, cardY + 98);
+      ctx.fillStyle = '#881337';
+      ctx.font = '900 28px Outfit';
+      ctx.fillText('GIRLS', cardX + 640, cardY + 130);
+
+      // Section 2: Watch Timer
+      ctx.fillStyle = '#334155';
+      ctx.font = '800 20px Outfit';
+      ctx.textAlign = 'left';
+      ctx.fillText('⏱️ Match Timer', cardX + 50, cardY + 200);
+
+      // Watch Center & Dial
+      const watchCenterX = cardX + 500;
+      const watchCenterY = cardY + 380;
+      const watchRadius = 150;
+
+      // Watch Crown
+      roundRect(ctx, watchCenterX - 18, watchCenterY - watchRadius - 32, 36, 18, 6, '#94a3b8', true, '#64748b', 2);
+
+      // Watch Outer Case
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(watchCenterX, watchCenterY, watchRadius + 16, 0, Math.PI * 2);
+      ctx.fillStyle = '#e2e8f0';
+      ctx.shadowColor = 'rgba(0,0,0,0.15)';
+      ctx.shadowBlur = 20;
+      ctx.fill();
+
+      // Watch Face
+      ctx.beginPath();
+      ctx.arc(watchCenterX, watchCenterY, watchRadius, 0, Math.PI * 2);
+      ctx.fillStyle = '#f8fafc';
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.fill();
+
+      // Numbers 1 to 12
+      ctx.font = '800 20px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      for (let i = 1; i <= 12; i++) {
+        const ang = (i * 30 - 90) * (Math.PI / 180);
+        const nx = watchCenterX + Math.cos(ang) * (watchRadius - 32);
+        const ny = watchCenterY + Math.sin(ang) * (watchRadius - 32);
+
+        if (i === 2 && t >= 1.4) {
+          ctx.beginPath();
+          ctx.arc(nx, ny, 19, 0, Math.PI * 2);
+          ctx.fillStyle = '#2563eb';
+          ctx.shadowColor = 'rgba(37, 99, 235, 0.5)';
+          ctx.shadowBlur = 10;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = '#ffffff';
+        } else {
+          ctx.fillStyle = '#64748b';
+        }
+        ctx.fillText(i.toString(), nx, ny);
+      }
+
+      // Center LCD Screen
+      roundRect(ctx, watchCenterX - 75, watchCenterY - 32, 150, 64, 14, '#ffffff', true, '#cbd5e1', 2);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 28px Outfit';
+      ctx.fillText('02:00', watchCenterX, watchCenterY - 6);
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '800 12px Outfit';
+      ctx.fillText('2 MIN MATCH', watchCenterX, watchCenterY + 16);
+
+      // Rotating Watch Hand (animates clockwise from 0 deg to 60 deg)
+      let handAngle = 0; // pointing to 12 (straight up)
+      if (t < 0.8) {
+        handAngle = 0;
+      } else if (t < 2.0) {
+        const prog = (t - 0.8) / 1.2;
+        handAngle = prog * 60; // 0 to 60 degrees (pointing to 2 o'clock)
+      } else {
+        handAngle = 60;
+      }
+
+      ctx.save();
+      ctx.translate(watchCenterX, watchCenterY);
+      ctx.rotate(handAngle * (Math.PI / 180));
+      ctx.beginPath();
+      ctx.moveTo(-4, 0);
+      ctx.lineTo(0, -watchRadius + 38);
+      ctx.lineTo(4, 0);
+      ctx.fillStyle = '#ef4444';
+      ctx.shadowColor = 'rgba(239, 68, 68, 0.6)';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+
+      // Pin
+      ctx.beginPath();
+      ctx.arc(0, 0, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#0f172a';
+      ctx.fill();
+      ctx.restore();
+      ctx.restore();
+
+      // Start Button
+      const btnY = cardY + 620;
+      const btnW = 900;
+      const btnH = 80;
+      const btnX = cardX + 50;
+
+      const btnPressed = t >= 3.0;
+      ctx.save();
+      if (!btnPressed) {
+        ctx.shadowColor = 'rgba(37, 99, 235, 0.45)';
+        ctx.shadowBlur = 25;
+        ctx.shadowOffsetY = 8;
+      }
+      const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY);
+      btnGrad.addColorStop(0, '#2563eb');
+      btnGrad.addColorStop(1, '#1d4ed8');
+      roundRect(ctx, btnX, btnY + (btnPressed ? 4 : 0), btnW, btnH, 24, btnGrad, false);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 28px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🚀 START TUG OF WAR MATCH! 🪢', btnX + btnW / 2, btnY + btnH / 2 + (btnPressed ? 4 : 0));
+      ctx.restore();
+
+      // Animated Cursor
+      if (t >= 0.8 && t < 2.4) {
+        const ang = (2 * 30 - 90) * Math.PI / 180;
+        const curX = watchCenterX + Math.cos(ang) * (watchRadius - 32);
+        const curY = watchCenterY + Math.sin(ang) * (watchRadius - 32);
+        drawCursor(ctx, curX, curY, 1 + Math.sin(t * 8) * 0.15);
+      } else if (t >= 2.6 && t < 3.4) {
+        drawCursor(ctx, 960, btnY + 40, t >= 3.0 ? 0.8 : 1.2);
+      }
+    }
+
+    // =========================================================================
+    // SCENE 2: COUNTDOWN OVERLAY (3.5s - 5.5s)
+    // =========================================================================
+    function drawScene2(t) {
+      drawScene3(5.6, true);
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      const relT = t - 3.5;
+      let countText = '3';
+      let subtext = 'GET READY TO PULL!';
+      let color = '#3b82f6';
+      let pulse = 1;
+
+      if (relT < 0.7) {
+        countText = '3';
+        subtext = 'READY...';
+        color = '#3b82f6';
+        pulse = 1 + (0.7 - relT) * 0.5;
+      } else if (relT < 1.4) {
+        countText = '2';
+        subtext = 'SET...';
+        color = '#f59e0b';
+        pulse = 1 + (1.4 - relT) * 0.5;
+      } else {
+        countText = 'GO!';
+        subtext = 'PULL THE ROPE!';
+        color = '#10b981';
+        pulse = 1 + (2.0 - relT) * 0.6;
+      }
+
+      ctx.save();
+      ctx.translate(960, 500);
+      ctx.scale(pulse, pulse);
+
+      ctx.fillStyle = color;
+      ctx.font = '900 160px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 40;
+      ctx.fillText(countText, 0, 0);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 36px Outfit';
+      ctx.shadowBlur = 10;
+      ctx.fillText(subtext, 0, 120);
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // SCENE 3: GAMEPLAY ARENA BATTLE (5.5s - 17.2s)
+    // =========================================================================
+    function drawScene3(t, isPaused = false) {
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      const matchT = t - 5.5;
+
+      let blueScore = 0;
+      let redScore = 0;
+      let blueStreak = 0;
+      let redStreak = 0;
+
+      let blueQType = 'MULTIPLICATION';
+      let blueQ = '3 × 8 = ?';
+      let blueAns = '';
+      let blueActiveKey = null;
+
+      let redQType = 'CUBE';
+      let redQ = '3³ = ?';
+      let redAns = '';
+      let redActiveKey = null;
+
+      let targetRopeOffset = 0;
+
+      if (matchT < 2.0) {
+        if (matchT > 0.9) { blueAns = '2'; blueActiveKey = '2'; }
+        if (matchT > 1.3) { blueAns = '24'; blueActiveKey = '4'; }
+        if (matchT > 1.7) { blueActiveKey = 'enter'; }
+      } else if (matchT < 4.0) {
+        blueScore = 10; blueStreak = 1; blueAns = '24'; targetRopeOffset = -22;
+        if (!isPaused && arena.state !== 'pull-left' && matchT < 2.6) {
+          arena.setPull(-22, 'left');
+        }
+        if (matchT > 2.8) { redAns = '2'; redActiveKey = '2'; }
+        if (matchT > 3.2) { redAns = '27'; redActiveKey = '7'; }
+        if (matchT > 3.6) { redActiveKey = 'enter'; }
+      } else if (matchT < 6.2) {
+        blueScore = 10; blueStreak = 1; redScore = 10; redStreak = 1; redAns = '27';
+        targetRopeOffset = 8;
+        if (!isPaused && arena.state !== 'pull-right' && matchT < 4.6) {
+          arena.setPull(30, 'right');
+        }
+
+        blueQType = 'SQUARE ROOT';
+        blueQ = '√64 = ?';
+        if (matchT > 5.0) { blueAns = '8'; blueActiveKey = '8'; }
+        if (matchT > 5.6) { blueActiveKey = 'enter'; }
+      } else if (matchT < 8.5) {
+        blueScore = 30; blueStreak = 2; redScore = 10; redAns = '';
+        targetRopeOffset = -48;
+        if (!isPaused && arena.state !== 'pull-left' && matchT < 6.8) {
+          arena.setPull(-56, 'left');
+        }
+
+        redQType = 'POWER';
+        redQ = '4³ = ?';
+        if (matchT > 7.1) { redAns = '6'; redActiveKey = '6'; }
+        if (matchT > 7.5) { redAns = '64'; redActiveKey = '4'; }
+        if (matchT > 7.9) { redActiveKey = 'enter'; }
+      } else if (matchT < 10.5) {
+        blueScore = 30; redScore = 25; redAns = '64';
+        targetRopeOffset = -20;
+        if (!isPaused && arena.state !== 'pull-right' && matchT < 9.1) {
+          arena.setPull(28, 'right');
+        }
+
+        blueQType = 'POWER';
+        blueQ = '9² = ?';
+        if (matchT > 9.3) { blueAns = '8'; blueActiveKey = '8'; }
+        if (matchT > 9.7) { blueAns = '81'; blueActiveKey = '1'; }
+        if (matchT > 10.1) { blueActiveKey = 'enter'; }
+      } else {
+        blueScore = 240; blueStreak = 3; redScore = 25; blueAns = '81';
+        targetRopeOffset = -95;
+        if (!isPaused && arena.state !== 'win-left') {
+          arena.targetOffset = -95;
+          arena.triggerWin('left');
+        }
+      }
+
+      arena.targetOffset = targetRopeOffset;
+
+      // 2. Top Header Dashboard
+      // Blue Badge
+      roundRect(ctx, 60, 20, 380, 88, 22, '#eff6ff', true, '#bfdbfe', 2);
+      ctx.font = '42px Outfit';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('👦', 85, 64);
+      ctx.fillStyle = '#1e3a8a';
+      ctx.font = '900 24px Outfit';
+      ctx.fillText('BOYS', 145, 48);
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '800 16px Outfit';
+      ctx.fillText(`🔥 ${blueStreak}`, 225, 48);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 32px Outfit';
+      ctx.fillText(`${blueScore} PTS`, 145, 80);
+
+      // Center HUD Circular Timer
+      roundRect(ctx, 740, 20, 440, 88, 24, '#ffffff', true, '#e2e8f0', 2);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(805, 64, 30, 0, Math.PI * 2);
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      const timerProg = Math.max(0, 1 - (matchT / 120));
+      ctx.beginPath();
+      ctx.arc(805, 64, 30, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * timerProg);
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 28px Outfit';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      const secLeft = Math.max(0, 120 - Math.floor(matchT));
+      const mStr = String(Math.floor(secLeft / 60)).padStart(2, '0');
+      const sStr = String(secLeft % 60).padStart(2, '0');
+      ctx.fillText(`${mStr}:${sStr}`, 850, 62);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '800 13px Outfit';
+      ctx.fillText('TIME LEFT', 850, 82);
+
+      // Icon Buttons
+      ctx.font = '19px Outfit';
+      ctx.fillText('⏸️  🔄  🔊  🎵  ⚙️', 995, 66);
+      ctx.restore();
+
+      // Red Badge
+      roundRect(ctx, 1480, 20, 380, 88, 22, '#fff1f2', true, '#fecdd3', 2);
+      ctx.font = '42px Outfit';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('👧', 1505, 64);
+      ctx.fillStyle = '#881337';
+      ctx.font = '900 24px Outfit';
+      ctx.fillText('GIRLS', 1565, 48);
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '800 16px Outfit';
+      ctx.fillText(`🔥 ${redStreak}`, 1655, 48);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 32px Outfit';
+      ctx.fillText(`${redScore} PTS`, 1565, 80);
+
+      // 3. Left Console (BOYS)
+      const p1X = 60;
+      const p1Y = 126;
+      const p1W = 440;
+      roundRect(ctx, p1X, p1Y, p1W, 924, 28, '#ffffff', true, '#bfdbfe', 2);
+
+      // Question Box
+      roundRect(ctx, p1X + 24, p1Y + 24, p1W - 48, 140, 20, '#eff6ff', true, '#bfdbfe', 2);
+      roundRect(ctx, p1X + 44, p1Y + 40, 160, 28, 14, '#dbeafe', false);
+      ctx.fillStyle = '#1d4ed8';
+      ctx.font = '800 13px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(blueQType, p1X + 124, p1Y + 54);
+
+      ctx.fillStyle = '#1e3a8a';
+      ctx.font = '900 52px Outfit';
+      ctx.fillText(blueQ, p1X + (p1W / 2), p1Y + 115);
+
+      // Answer Display Box
+      const ans1Y = p1Y + 184;
+      roundRect(ctx, p1X + 24, ans1Y, p1W - 48, 76, 18, '#ffffff', true, '#3b82f6', 3);
+      ctx.fillStyle = blueAns ? '#0f172a' : '#94a3b8';
+      ctx.font = '900 38px Outfit';
+      ctx.fillText(blueAns || 'Enter answer', p1X + (p1W / 2), ans1Y + 38);
+
+      // Left Numpad
+      drawNumpad(ctx, p1X + 24, ans1Y + 95, p1W - 48, 600, blueActiveKey, '#2563eb');
+
+      // 4. Center Stadium (Tug Arena)
+      const stdX = 520;
+      const stdY = 126;
+      const stdW = 880;
+      const stdH = 924;
+
+      roundRect(ctx, stdX, stdY, stdW, stdH, 28, '#ffffff', true, '#e2e8f0', 2);
+
+      // Advantage Bar
+      roundRect(ctx, stdX + 24, stdY + 18, stdW - 48, 44, 22, '#f8fafc', true, '#e2e8f0', 1);
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '800 14px Outfit';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('◀ BLUE ADVANTAGE', stdX + 44, stdY + 40);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.textAlign = 'right';
+      ctx.fillText('RED ADVANTAGE ▶', stdX + stdW - 44, stdY + 40);
+
+      // Track Meter
+      const trackX = stdX + 220;
+      const trackW = stdW - 440;
+      roundRect(ctx, trackX, stdY + 33, trackW, 14, 7, '#e2e8f0', false);
+
+      const barShift = (arena.ropeOffset / 100) * (trackW / 2);
+      if (barShift < 0) {
+        roundRect(ctx, trackX + trackW / 2 + barShift, stdY + 33, -barShift, 14, 7, '#3b82f6', false);
+      } else {
+        roundRect(ctx, trackX + trackW / 2, stdY + 33, barShift, 14, 7, '#f43f5e', false);
+      }
+
+      // Draw Center Tug Arena Canvas
+      if (!isPaused) {
+        arena.update(1 / 30);
+      }
+      arena.draw();
+      ctx.drawImage(stadiumCanvas, stdX, stdY + 76, stdW, 830);
+
+      // 5. Right Console (GIRLS)
+      const p2X = 1420;
+      const p2Y = 126;
+      const p2W = 440;
+      roundRect(ctx, p2X, p2Y, p2W, 924, 28, '#ffffff', true, '#fecdd3', 2);
+
+      // Question Box
+      roundRect(ctx, p2X + 24, p2Y + 24, p2W - 48, 140, 20, '#fff1f2', true, '#fecdd3', 2);
+      roundRect(ctx, p2X + 44, p2Y + 40, 140, 28, 14, '#ffe4e6', false);
+      ctx.fillStyle = '#be123c';
+      ctx.font = '800 13px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(redQType, p2X + 114, p2Y + 54);
+
+      ctx.fillStyle = '#881337';
+      ctx.font = '900 52px Outfit';
+      ctx.fillText(redQ, p2X + (p2W / 2), p2Y + 115);
+
+      // Answer Display Box
+      const ans2Y = p2Y + 184;
+      roundRect(ctx, p2X + 24, ans2Y, p2W - 48, 76, 18, '#ffffff', true, '#f43f5e', 3);
+      ctx.fillStyle = redAns ? '#0f172a' : '#94a3b8';
+      ctx.font = '900 38px Outfit';
+      ctx.fillText(redAns || 'Enter answer', p2X + (p2W / 2), ans2Y + 38);
+
+      // Right Numpad
+      drawNumpad(ctx, p2X + 24, ans2Y + 95, p2W - 48, 600, redActiveKey, '#f43f5e');
+    }
+
+    // Helper: Draw Numpad
+    function drawNumpad(ctx, x, y, w, h, activeKey, heroColor) {
+      const keys = [
+        ['1', '2', '3'],
+        ['4', '5', '6'],
+        ['7', '8', '9'],
+        ['C', '0', '⌫']
+      ];
+
+      const gap = 14;
+      const keyW = (w - gap * 2) / 3;
+      const keyH = (h - 110 - gap * 3) / 4;
+
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 3; c++) {
+          const k = keys[r][c];
+          const kx = x + c * (keyW + gap);
+          const ky = y + r * (keyH + gap);
+
+          const isActive = (activeKey === k) || (activeKey === 'clear' && k === 'C') || (activeKey === 'backspace' && k === '⌫');
+          const isSpecial = k === 'C' || k === '⌫';
+
+          roundRect(
+            ctx, kx, ky, keyW, keyH, 18,
+            isActive ? heroColor : (isSpecial ? '#f8fafc' : '#ffffff'),
+            true, isActive ? heroColor : '#cbd5e1', 2
+          );
+
+          ctx.fillStyle = isActive ? '#ffffff' : (k === 'C' ? '#ef4444' : '#0f172a');
+          ctx.font = '800 30px Outfit';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(k, kx + keyW / 2, ky + keyH / 2);
+        }
+      }
+
+      // Hero GO button
+      const goY = y + 4 * (keyH + gap) + 4;
+      const isGoActive = activeKey === 'enter';
+      roundRect(ctx, x, goY, w, 82, 22, isGoActive ? '#15803d' : heroColor, false);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 28px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('GO ⏎', x + w / 2, goY + 41);
+    }
+
+    // =========================================================================
+    // SCENE 4: FULL-SCREEN VICTORY CELEBRATION (17.2s - 22.8s)
+    // =========================================================================
+    function drawScene4(t) {
+      drawScene3(17.0, true);
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      const relT = t - 17.2;
+      const centerX = 960;
+      const centerY = 500;
+
+      // 2. Rotating Sunburst Rays
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(relT * 0.45);
+      const rays = 24;
+      for (let i = 0; i < rays; i++) {
+        const ang = (i * (360 / rays)) * Math.PI / 180;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, 1200, ang, ang + (Math.PI / rays));
+        ctx.fillStyle = (i % 2 === 0) ? 'rgba(251, 191, 36, 0.08)' : 'rgba(245, 158, 11, 0.03)';
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // 3. Victory Card
+      const cardW = 840;
+      const cardH = 680;
+      const cardX = centerX - cardW / 2;
+      const cardY = centerY - cardH / 2 - 20;
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 40;
+      roundRect(ctx, cardX, cardY, cardW, cardH, 36, '#ffffff', true, '#fbbf24', 4);
+      ctx.restore();
+
+      // Bouncing Trophy 🏆
+      const bounce = Math.abs(Math.sin(relT * 4)) * 25;
+      ctx.font = '110px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🏆', centerX, cardY + 120 - bounce);
+
+      // Title
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 58px Outfit';
+      ctx.fillText('🎉 BOYS WIN! 🏆', centerX, cardY + 235);
+
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '800 24px Outfit';
+      ctx.fillText('KNOCKOUT VICTORY! 🪢', centerX, cardY + 285);
+
+      // Stats Pill Grid
+      const statY = cardY + 340;
+      roundRect(ctx, centerX - 360, statY, 720, 160, 24, '#f8fafc', true, '#e2e8f0', 2);
+
+      // Stat 1: Score
+      ctx.fillStyle = '#64748b';
+      ctx.font = '700 16px Outfit';
+      ctx.fillText('FINAL SCORE', centerX - 240, statY + 45);
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '900 42px Outfit';
+      ctx.fillText('240 PTS', centerX - 240, statY + 95);
+
+      // Stat 2: Accuracy
+      ctx.fillStyle = '#64748b';
+      ctx.font = '700 16px Outfit';
+      ctx.fillText('ACCURACY', centerX, statY + 45);
+      ctx.fillStyle = '#10b981';
+      ctx.font = '900 42px Outfit';
+      ctx.fillText('100%', centerX, statY + 95);
+
+      // Stat 3: Pull Force
+      ctx.fillStyle = '#64748b';
+      ctx.font = '700 16px Outfit';
+      ctx.fillText('PULL FORCE', centerX + 240, statY + 45);
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '900 42px Outfit';
+      ctx.fillText('KO 100%', centerX + 240, statY + 95);
+
+      // Play Again Button simulation
+      const paY = cardY + 540;
+      roundRect(ctx, centerX - 220, paY, 440, 72, 22, '#2563eb', false);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 24px Outfit';
+      ctx.fillText('🔄 PLAY AGAIN', centerX, paY + 36);
+
+      // Confetti Rain
+      arena.spawnBigCelebration();
+      for (let i = 0; i < arena.particles.length; i++) {
+        const p = arena.particles[i];
+        if (p.type === 'confetti') {
+          ctx.save();
+          ctx.translate(p.x * 2.1, p.y * 1.3);
+          ctx.rotate(p.rotation);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height);
+          ctx.restore();
+        }
+      }
+    }
+
+    // =========================================================================
+    // SCENE 5: LINKEDIN OUTRO CARD (22.8s - 27.0s)
+    // =========================================================================
+    function drawScene5(t) {
+      const bg = ctx.createLinearGradient(0, 0, 1920, 1080);
+      bg.addColorStop(0, '#0a0f1d');
+      bg.addColorStop(0.5, '#0f172a');
+      bg.addColorStop(1, '#020617');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      const relT = t - 22.8;
+      const alpha = Math.min(1, relT / 0.6);
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      const g1 = ctx.createRadialGradient(400, 300, 0, 400, 300, 600);
+      g1.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
+      g1.addColorStop(1, 'transparent');
+      ctx.fillStyle = g1;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      const g2 = ctx.createRadialGradient(1500, 800, 0, 1500, 800, 600);
+      g2.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+      g2.addColorStop(1, 'transparent');
+      ctx.fillStyle = g2;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      const cardW = 1200;
+      const cardH = 760;
+      const cardX = (1920 - cardW) / 2;
+      const cardY = (1080 - cardH) / 2;
+
+      roundRect(ctx, cardX, cardY, cardW, cardH, 36, 'rgba(30, 41, 59, 0.7)', true, 'rgba(255, 255, 255, 0.15)', 2);
+
+      // Top Badge
+      roundRect(ctx, 960 - 200, cardY + 50, 400, 44, 22, 'rgba(59, 130, 246, 0.2)', true, '#3b82f6', 1.5);
+      ctx.fillStyle = '#60a5fa';
+      ctx.font = '800 16px Outfit';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('⚡ 100% OPEN SOURCE ON GITHUB', 960, cardY + 72);
+
+      // Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 68px Outfit';
+      ctx.fillText('TUG OF MATH 🪢', 960, cardY + 160);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 24px Outfit';
+      ctx.fillText('Competitive 2-Player Smartboard & Touchscreen Math Quiz', 960, cardY + 215);
+
+      // 4 Feature Pills
+      const pills = [
+        '🎮 HTML5 Canvas 60 FPS Physics',
+        '🎵 Web Audio API Procedural SFX',
+        '📦 Zero External Dependencies',
+        '📱 Smartboard, PC & Mobile LAN Ready'
+      ];
+
+      const pW = 540;
+      const pH = 64;
+      pills.forEach((pillText, idx) => {
+        const col = idx % 2;
+        const row = Math.floor(idx / 2);
+        const px = cardX + 70 + col * (pW + 20);
+        const py = cardY + 270 + row * (pH + 18);
+
+        roundRect(ctx, px, py, pW, pH, 18, 'rgba(15, 23, 42, 0.65)', true, 'rgba(148, 163, 184, 0.2)', 1);
+        ctx.fillStyle = '#f1f5f9';
+        ctx.font = '700 20px Outfit';
+        ctx.textAlign = 'left';
+        ctx.fillText(pillText, px + 25, py + pH / 2);
+      });
+
+      // Big GitHub Repo Card
+      const repoY = cardY + 450;
+      const repoW = 1060;
+      const repoH = 150;
+      const repoX = cardX + 70;
+
+      const repoGrad = ctx.createLinearGradient(repoX, repoY, repoX + repoW, repoY);
+      repoGrad.addColorStop(0, 'rgba(37, 99, 235, 0.3)');
+      repoGrad.addColorStop(1, 'rgba(79, 70, 229, 0.3)');
+      roundRect(ctx, repoX, repoY, repoW, repoH, 24, repoGrad, true, '#3b82f6', 2.5);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '800 18px Outfit';
+      ctx.textAlign = 'left';
+      ctx.fillText('🔗 GITHUB REPOSITORY', repoX + 40, repoY + 48);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px Outfit';
+      ctx.fillText('github.com/aniket6391/Tug-of-Math', repoX + 40, repoY + 98);
+
+      // Star Badge
+      roundRect(ctx, repoX + repoW - 220, repoY + 45, 180, 60, 18, '#f59e0b', false);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 22px Outfit';
+      ctx.textAlign = 'center';
+      ctx.fillText('⭐ Star Repo', repoX + repoW - 130, repoY + 75);
+
+      // Footer Author
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 20px Outfit';
+      ctx.textAlign = 'center';
+      ctx.fillText('Designed & Engineered by Aniket (@aniket6391) • Built for Classrooms & Fun', 960, cardY + 670);
+
+      ctx.restore();
+    }
+
+    // =========================================================================
+    // MASTER RENDER DISPATCHER
+    // =========================================================================
+    function render(t) {
+      if (t < 3.5) {
+        drawScene1(t);
+      } else if (t < 5.5) {
+        drawScene2(t);
+      } else if (t < 17.2) {
+        drawScene3(t);
+      } else if (t < 22.8) {
+        drawScene4(t);
+      } else {
+        drawScene5(t);
+      }
+    }
+
+    window.renderFrame = render;
+
+    // Automated MediaRecorder Runner
+    window.startRecording = function(durationSec = 27) {
+      const chunks = [];
+      const stream = canvas.captureStream(30);
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'video/webm;codecs=vp9',
+        videoBitsPerSecond: 12000000
+      });
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const reader = new FileReader();
+        reader.onload = () => {
+          window.recordedData = reader.result;
+          window.isFinished = true;
+          console.log('Video recording finished successfully! Bytes:', blob.size);
+        };
+        reader.readAsDataURL(blob);
+      };
+
+      mediaRecorder.start();
+
+      const startTime = performance.now();
+      function loop(now) {
+        const elapsed = (now - startTime) / 1000;
+        render(elapsed);
+        if (elapsed < durationSec) {
+          requestAnimationFrame(loop);
+        } else {
+          mediaRecorder.stop();
+        }
+      }
+      requestAnimationFrame(loop);
+    };
+
+    render(0);
+  </script>
+</body>
+</html>
