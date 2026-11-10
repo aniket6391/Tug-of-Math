@@ -32,27 +32,25 @@
 
 </div>
 
-## 📸 Screenshots
+## 📸 Full HD Project Screenshots
 
 <div align="center">
 
-### 🏟️ Full-Page Wide Arena with Real-Time Tug of War
-*Edge-to-edge layout with full-width tactile calculators and animated rope physics.*
-<img src="assets/screenshots/arena-gameplay.jpg" alt="Arena Gameplay Screenshot" width="95%" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
+### 🏟️ 1. Full-Page Wide Calculator Arena (In-Game Battle)
+*100% Edge-to-edge layout with full-width tactile calculators and 60 FPS real-time animated rope physics.*
+<img src="assets/screenshots/arena-battle-hd.png" alt="Full-Page Arena Gameplay Screenshot" width="100%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);" />
 
 <br/><br/>
 
-| ⏱️ Interactive 1-to-12 Watch Timer | 📱 Instant Mobile QR Connect |
-|:---:|:---:|
-| <img src="assets/screenshots/watch-timer.png" alt="1 to 12 Watch Timer" width="400px" /> | <img src="assets/screenshots/mobile-qr.png" alt="Mobile QR Code Modal" width="400px" /> |
-| *Click any number 1-12 to set minutes. Hand physically rotates and shows time in center.* | *Scan with camera to play instantly on any smartphone with 5G/4G or Wi-Fi.* |
+### ⏱️ 2. Interactive 1-to-12 Watch Timer & Competitor Setup
+*Authentic 1-to-12 clock dial where every number is clickable, with rotating needle and center LCD readout.*
+<img src="assets/screenshots/setup-watch-timer-hd.png" alt="Interactive 1 to 12 Watch Timer and Setup Screen" width="100%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);" />
 
-<br/>
+<br/><br/>
 
-### 🏫 Real-World Classroom Smartboard Inspiration
-<img src="assets/screenshots/smartboard-classroom.jpg" alt="Smartboard Classroom Photo" width="70%" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
-<br/>
-*Designed for classrooms, smartboards, STEM competitions, and split-screen multiplayer!*
+### 🏆 3. Full-Screen Animated Victory Celebration
+*Rotating golden sunburst rays, glowing trophy spotlight, confetti bursts, and detailed accuracy statistics.*
+<img src="assets/screenshots/victory-celebration-hd.png" alt="Animated Victory Celebration Screen" width="100%" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);" />
 
 </div>
 
@@ -152,10 +150,9 @@ Tug-of-Math/
 └── assets/
     ├── tug-of-war-animation.svg # Animated SVG hero banner
     └── screenshots/
-        ├── arena-gameplay.jpg
-        ├── watch-timer.png
-        ├── mobile-qr.png
-        └── smartboard-classroom.jpg
+        ├── arena-battle-hd.png
+        ├── setup-watch-timer-hd.png
+        └── victory-celebration-hd.png
 ```
 
 ---

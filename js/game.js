@@ -128,6 +128,29 @@ class TugGame {
 
     // 3. Sync Setup Timer UI
     this.updateSetupTimerUI();
+
+    // 4. Check for view query parameter (e.g. for Full HD screenshots)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('view') === 'arena') {
+      this.dom.setupScreen.classList.remove('active');
+      this.dom.gameScreen.classList.add('active');
+      this.startMatch();
+      this.player1.score = 60;
+      this.player2.score = 40;
+      this.updatePlayerScoreUI(this.player1);
+      this.updatePlayerScoreUI(this.player2);
+      this.arena.setPull(24, 'left');
+      setTimeout(() => this.arena.setupResize(), 50);
+    } else if (params.get('view') === 'victory') {
+      this.dom.setupScreen.classList.remove('active');
+      this.dom.gameScreen.classList.add('active');
+      this.player1.score = 70;
+      this.player2.score = 40;
+      this.player1.attempts = 8;
+      this.player2.attempts = 6;
+      this.endMatchWithWinner(this.player1, 'Unstoppable pulling power and math speed!');
+      this.dom.victoryOverlay.classList.add('active');
+    }
   }
 
   // Update Setup Screen Watch Readout, Hand Angle & Active Numbers (1 to 12)
