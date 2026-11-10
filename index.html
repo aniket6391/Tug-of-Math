@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tug of Math - 2 Player Animated Tug-of-War Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       VIEW 1: SETUP & WELCOME SCREEN (OPENS FIRST!)
+       ========================================================================== -->
+  <div id="setupScreen" class="view-screen active">
+    <div class="setup-container">
+      <div class="setup-hero">
+        <h1 class="setup-title">TUG OF MATH</h1>
+        <p class="setup-subtitle">Two competitors pull the rope with math brain power! Who will win?</p>
+      </div>
+
+      <div class="setup-card">
+        <!-- Competitor Names Setting -->
+        <div class="setup-group">
+          <label class="group-title">👥 Competitor Names</label>
+          <div class="competitors-row">
+            <div class="competitor-input-card blue-card">
+              <div class="competitor-header">
+                <div class="competitor-avatar">👦</div>
+                <span class="competitor-title">Player 1 (Blue)</span>
+              </div>
+              <input type="text" id="setupP1Name" value="BOYS" maxlength="15" class="competitor-input" placeholder="Team Blue Name">
+            </div>
+
+            <div class="vs-badge">VS</div>
+
+            <div class="competitor-input-card red-card">
+              <div class="competitor-header">
+                <div class="competitor-avatar">👧</div>
+                <span class="competitor-title">Player 2 (Red)</span>
+              </div>
+              <input type="text" id="setupP2Name" value="GIRLS" maxlength="15" class="competitor-input" placeholder="Team Red Name">
+            </div>
+          </div>
+        </div>
+
+        <!-- Proper 1 to 12 Clock / Watch Timer Component -->
+        <div class="setup-group">
+          <label class="group-title">⏱️ Match Timer</label>
+          <div class="watch-timer-container">
+            <div class="watch-body" id="watchBody">
+              <!-- Top Crown Clicker -->
+              <div class="watch-crown" id="watchCrown" title="Reset Watch to 2 min"></div>
+
+              <!-- Watch Dial Face with All Numbers 1 to 12 -->
+              <div class="watch-face" id="watchFace" title="Click any number 1 to 12 to set match minutes">
+                <button type="button" class="clock-num clock-num-12" data-min="12" data-time="720">12</button>
+                <button type="button" class="clock-num clock-num-1" data-min="1" data-time="60">1</button>
+                <button type="button" class="clock-num clock-num-2 active" data-min="2" data-time="120">2</button>
+                <button type="button" class="clock-num clock-num-3" data-min="3" data-time="180">3</button>
+                <button type="button" class="clock-num clock-num-4" data-min="4" data-time="240">4</button>
+                <button type="button" class="clock-num clock-num-5" data-min="5" data-time="300">5</button>
+                <button type="button" class="clock-num clock-num-6" data-min="6" data-time="360">6</button>
+                <button type="button" class="clock-num clock-num-7" data-min="7" data-time="420">7</button>
+                <button type="button" class="clock-num clock-num-8" data-min="8" data-time="480">8</button>
+                <button type="button" class="clock-num clock-num-9" data-min="9" data-time="540">9</button>
+                <button type="button" class="clock-num clock-num-10" data-min="10" data-time="600">10</button>
+                <button type="button" class="clock-num clock-num-11" data-min="11" data-time="660">11</button>
+
+                <!-- Center Digital Screen in Middle of Watch Where Needle Is -->
+                <div class="watch-center-lcd">
+                  <span id="setupTimerDisplay" class="watch-lcd-digits">02:00</span>
+                  <span id="setupTimerMode" class="watch-lcd-label">2 MIN MATCH</span>
+                </div>
+
+                <!-- Rotating Watch Hand -->
+                <div class="watch-hand-wrap" id="watchHandWrap">
+                  <div class="watch-hand"></div>
+                </div>
+                <div class="watch-center-pin"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Start Button -->
+        <button id="btnStartGame" class="btn-start-hero">
+          🚀 START TUG OF WAR MATCH! 🪢
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       VIEW 2: DRAMATIC 3-2-1-GO! COUNTDOWN OVERLAY
+       ========================================================================== -->
+  <div id="countdownOverlay" class="countdown-overlay">
+    <div id="countdownNumber" class="countdown-number">3</div>
+    <div id="countdownSubtext" class="countdown-subtext">GET READY TO PULL!</div>
+  </div>
+
+  <!-- ==========================================================================
+       VIEW 3: MAIN GAMEPLAY ARENA SCREEN
+       ========================================================================== -->
+  <div id="gameScreen" class="view-screen">
+    <div class="game-container">
+      <!-- Header Dashboard with Professional Circular Ring Timer -->
+      <header class="game-header">
+        <!-- Player 1 Header -->
+        <div class="player-badge team-blue">
+          <div class="badge-avatar">👦</div>
+          <div class="badge-info">
+            <div class="player-name-wrap">
+              <span id="p1NameLabel" class="player-name">BOYS</span>
+              <span id="p1Streak" class="streak-pill">🔥 0</span>
+            </div>
+            <div class="score-display">
+              <span id="p1Score">0</span>
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">PTS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Circular Ring Timer & Controls -->
+        <div class="center-hud">
+          <div id="proHudTimer" class="pro-hud-timer" title="Match Countdown">
+            <svg class="timer-ring-svg" viewBox="0 0 44 44">
+              <circle class="ring-bg" cx="22" cy="22" r="18" fill="none" stroke-width="3.5" />
+              <circle id="timerProgressRing" class="ring-progress" cx="22" cy="22" r="18" fill="none" stroke-width="3.5" stroke-dasharray="113.097" stroke-dashoffset="0" stroke-linecap="round" />
+            </svg>
+            <div class="timer-readout-wrap">
+              <div id="timerDisplay" class="timer-clock-digits">02:00</div>
+              <span id="timerSubLabel" class="timer-clock-label">TIME LEFT</span>
+            </div>
+          </div>
+
+          <div class="hud-actions">
+            <button id="btnPause" class="icon-btn" title="Pause / Resume">⏸️</button>
+            <button id="btnRestart" class="icon-btn" title="Restart Match">🔄</button>
+            <button id="btnSound" class="icon-btn" title="Toggle Sound">🔊</button>
+            <button id="btnMusic" class="icon-btn" title="Toggle Relaxing Music">🎵</button>
+            <button id="btnSetupReturn" class="icon-btn" title="Change Setup / Names">⚙️</button>
+            <button id="btnFullscreen" class="icon-btn" title="Toggle Fullscreen">⛶</button>
+          </div>
+        </div>
+
+        <!-- Player 2 Header -->
+        <div class="player-badge team-red">
+          <div class="badge-info" style="align-items: flex-end;">
+            <div class="player-name-wrap">
+              <span id="p2Streak" class="streak-pill">🔥 0</span>
+              <span id="p2NameLabel" class="player-name">GIRLS</span>
+            </div>
+            <div class="score-display">
+              <span id="p2Score">0</span>
+              <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">PTS</span>
+            </div>
+          </div>
+          <div class="badge-avatar">👧</div>
+        </div>
+      </header>
+
+      <!-- Main Game Arena Grid -->
+      <main class="arena-grid">
+        <!-- Left Console: Player 1 (Blue) -->
+        <section class="player-console team-blue" id="p1Console">
+          <div class="question-card">
+            <div id="p1QuestionType" class="question-type-tag">Addition</div>
+            <div id="p1QuestionExpr" class="question-expression">19 + 30 = ?</div>
+          </div>
+
+          <div id="p1AnswerBox" class="answer-box">
+            <span id="p1AnswerDisplay" class="answer-value"><span class="answer-placeholder">Enter answer</span></span>
+            <span class="cursor-blink"></span>
+          </div>
+
+          <!-- On-Screen Touch Numpad for Player 1 -->
+          <div class="numpad-grid" id="p1Numpad">
+            <button class="key-btn" data-key="1">1</button>
+            <button class="key-btn" data-key="2">2</button>
+            <button class="key-btn" data-key="3">3</button>
+            <button class="key-btn" data-key="4">4</button>
+            <button class="key-btn" data-key="5">5</button>
+            <button class="key-btn" data-key="6">6</button>
+            <button class="key-btn" data-key="7">7</button>
+            <button class="key-btn" data-key="8">8</button>
+            <button class="key-btn" data-key="9">9</button>
+            <button class="key-btn btn-clear" data-key="clear">C</button>
+            <button class="key-btn" data-key="0">0</button>
+            <button class="key-btn btn-backspace" data-key="backspace">⌫</button>
+            <button class="key-btn btn-submit" data-key="enter">GO ⏎</button>
+          </div>
+        </section>
+
+        <!-- Center Tug Stadium -->
+        <section class="tug-arena-wrapper">
+          <div class="tug-meter-bar">
+            <span style="color: var(--blue-primary)">◀ BLUE ADVANTAGE</span>
+            <div class="meter-track">
+              <div id="meterFillBlue" class="meter-fill-blue"></div>
+              <div id="meterFillRed" class="meter-fill-red"></div>
+              <div class="meter-center-tick"></div>
+            </div>
+            <span style="color: var(--red-primary)">RED ADVANTAGE ▶</span>
+          </div>
+
+          <canvas id="tugCanvas"></canvas>
+        </section>
+
+        <!-- Right Console: Player 2 (Red) -->
+        <section class="player-console team-red" id="p2Console">
+          <div class="question-card">
+            <div id="p2QuestionType" class="question-type-tag">Square</div>
+            <div id="p2QuestionExpr" class="question-expression">9<sup class="math-power">2</sup> = ?</div>
+          </div>
+
+          <div id="p2AnswerBox" class="answer-box">
+            <span id="p2AnswerDisplay" class="answer-value"><span class="answer-placeholder">Enter answer</span></span>
+            <span class="cursor-blink"></span>
+          </div>
+
+          <!-- On-Screen Touch Numpad for Player 2 -->
+          <div class="numpad-grid" id="p2Numpad">
+            <button class="key-btn" data-key="1">1</button>
+            <button class="key-btn" data-key="2">2</button>
+            <button class="key-btn" data-key="3">3</button>
+            <button class="key-btn" data-key="4">4</button>
+            <button class="key-btn" data-key="5">5</button>
+            <button class="key-btn" data-key="6">6</button>
+            <button class="key-btn" data-key="7">7</button>
+            <button class="key-btn" data-key="8">8</button>
+            <button class="key-btn" data-key="9">9</button>
+            <button class="key-btn btn-clear" data-key="clear">C</button>
+            <button class="key-btn" data-key="0">0</button>
+            <button class="key-btn btn-backspace" data-key="backspace">⌫</button>
+            <button class="key-btn btn-submit" data-key="enter">GO ⏎</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       VIEW 4: AMAZING FULL-SCREEN ANIMATED WINNING CELEBRATION
+       ========================================================================== -->
+  <div id="victoryOverlay" class="victory-overlay">
+    <!-- Rotating Golden Sunburst Rays Background -->
+    <div class="sunburst-rays"></div>
+
+    <div class="victory-card">
+      <div class="trophy-spotlight">
+        <div class="sparkle-ring"></div>
+        <div class="trophy-emoji">🏆</div>
+      </div>
+
+      <h2 id="victoryHeadline" class="victory-title blue-win">BOYS WIN THE TUG OF WAR!</h2>
+      <p id="victorySubtext" class="victory-subtitle">Unstoppable pulling power and math speed!</p>
+
+      <!-- Stats Comparison -->
+      <div class="victory-stats-grid">
+        <div class="victory-stat-box p1-side">
+          <div id="vStatP1Name" class="v-stat-name" style="color: var(--blue-primary)">BOYS</div>
+          <div id="vStatP1Score" class="v-stat-score">0</div>
+          <div id="vStatP1Acc" class="v-stat-accuracy">100% Accuracy</div>
+        </div>
+
+        <div class="victory-stat-box">
+          <div id="vStatP2Name" class="v-stat-name" style="color: var(--red-primary)">GIRLS</div>
+          <div id="vStatP2Score" class="v-stat-score">0</div>
+          <div id="vStatP2Acc" class="v-stat-accuracy">100% Accuracy</div>
+        </div>
+      </div>
+
+      <div class="victory-actions">
+        <button id="btnRematch" class="btn-rematch">Play Rematch 🔄</button>
+        <button id="btnNewMatch" class="btn-new-match">Change Setup ⚙️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       VIEW 5: PHONE / TABLET QR CODE & LAN CONNECT MODAL
+       ========================================================================== -->
+  <div id="phoneModal" class="phone-modal-overlay">
+    <div class="phone-modal-card">
+      <button id="btnClosePhoneModal" class="btn-close-modal" aria-label="Close">&times;</button>
+      <div class="phone-modal-icon">📱</div>
+      <h2 class="phone-modal-title">Play On Your Phone / Tablet</h2>
+      
+      <!-- Live Server Status Indicator -->
+      <div id="phoneServerStatus" class="phone-status-pill online">🟢 Server Active (Ready to Scan)</div>
+
+      <!-- Warning shown ONLY if user opens via file:/// without running Play_On_Phone.bat -->
+      <div id="phoneOfflineAlert" class="phone-alert-offline">
+        ⚠️ <strong>Server is not running!</strong><br>
+        To activate this QR code, double-click <code>Play_On_Phone.bat</code> on your computer and keep that black window open!
+      </div>
+
+      <div class="qr-code-box">
+        <img id="phoneQrImage" class="qr-img" alt="Scan QR to Play on Phone" src="" />
+      </div>
+
+      <div class="phone-url-display">
+        <span class="url-label" id="phoneUrlTypeLabel">🌐 Open in Phone Browser (Works on 5G / 4G / Wi-Fi):</span>
+        <div class="phone-url-row">
+          <a id="phoneUrlLink" class="phone-url-text" href="http://10.162.158.13:3000" target="_blank">http://10.162.158.13:3000</a>
+          <button id="btnCopyPhoneUrl" class="btn-copy-url" type="button">📋 Copy</button>
+        </div>
+      </div>
+
+      <div class="phone-instructions-list">
+        <div class="inst-item">
+          <span class="inst-num">1</span>
+          <span>Ensure <strong>Play_On_Phone.bat</strong> is open on your computer.</span>
+        </div>
+        <div class="inst-item">
+          <span class="inst-num">2</span>
+          <span>Point your phone camera at the <strong>QR Code</strong> (or type the link above).</span>
+        </div>
+        <div class="inst-item">
+          <span class="inst-num">3</span>
+          <span>Rotate phone to <strong>Landscape mode 🔄</strong> for 2-player fun!</span>
+        </div>
+      </div>
+
+      <div class="phone-lan-note">
+        💡 <strong>Important:</strong> Keep the <code>Play_On_Phone.bat</code> window running on your PC while playing on your phone!
+      </div>
+    </div>
+  </div>
+
+  <script src="js/bundle.js"></script>
+</body>
+</html>

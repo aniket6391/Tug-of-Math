@@ -1,0 +1,14 @@
+# Node & Environment
+node_modules/
+npm-debug.log*
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
